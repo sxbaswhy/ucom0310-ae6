@@ -9,11 +9,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -118,6 +121,84 @@ class ReservaServiceTest {
 
             // Assert
             assertFalse(resultado);
+        }
+    }
+
+    @Nested
+    @DisplayName("R2/R3 · Cálculo del total con descuento por tipo")
+    class CalculoTotal {
+
+        /** Tolerancia para comparar montos en double sin depender del redondeo binario. */
+        private static final double DELTA = 1e-9;
+
+        @Test
+        @DisplayName("CP-07 · Cliente NORMAL paga el total sin descuento")
+        void clienteNormalPagaTotalSinDescuento() {
+            // Arrange
+            double totalBase = 100.0;
+
+            // Act
+            double total = servicio.calcularTotal("NORMAL", totalBase);
+
+            // Assert
+            assertEquals(100.0, total, DELTA);
+        }
+
+        @ParameterizedTest(name = "{0} · tipo={1}, base={2} → total={3}")
+        @CsvSource({
+                "CP-08, VIP,        100.0, 85.0",
+                "CP-09, ESTUDIANTE, 100.0, 90.0",
+                "CP-10, vip,        200.0, 170.0",
+                "CP-10, Estudiante,  50.0, 45.0"
+        })
+        @DisplayName("CP-08/CP-09/CP-10 · Aplica 15 % a VIP y 10 % a ESTUDIANTE sin importar mayúsculas")
+        void aplicaDescuentoSegunTipo(String caso, String tipo, double totalBase, double esperado) {
+            // Act
+            double total = servicio.calcularTotal(tipo, totalBase);
+
+            // Assert
+            assertEquals(esperado, total, DELTA, () -> caso + ": descuento incorrecto para " + tipo);
+        }
+
+        @Test
+        @DisplayName("CP-11 · Un tipo no contemplado no recibe descuento")
+        void tipoNoContempladoNoRecibeDescuento() {
+            // Act
+            double total = servicio.calcularTotal("CORPORATIVO", 100.0);
+
+            // Assert
+            assertEquals(100.0, total, DELTA);
+        }
+
+        @Test
+        @DisplayName("CP-12 · Límite: total base 0 es válido y no lanza excepción")
+        void totalCeroEsValido() {
+            // Act
+            double total = servicio.calcularTotal("VIP", 0.0);
+
+            // Assert
+            assertEquals(0.0, total, DELTA);
+        }
+
+        @Test
+        @DisplayName("CP-13 · Total base negativo lanza IllegalArgumentException")
+        void totalNegativoLanzaExcepcion() {
+            // Act
+            IllegalArgumentException error = assertThrows(
+                    IllegalArgumentException.class,
+                    () -> servicio.calcularTotal("NORMAL", -1));
+
+            // Assert
+            assertEquals("Total base inválido", error.getMessage());
+        }
+
+        @Test
+        @DisplayName("CP-14 · Límite inválido: -0.01 se rechaza aunque el tipo tenga descuento")
+        void totalLigeramenteNegativoSeRechazaAunqueTengaDescuento() {
+            // Act + Assert
+            assertThrows(
+                    IllegalArgumentException.class,
+                    () -> servicio.calcularTotal("VIP", -0.01));
         }
     }
 }
