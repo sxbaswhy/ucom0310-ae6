@@ -60,11 +60,6 @@ class ReservaServiceTest {
         servicio = new ReservaService(disponibilidad, repository, notificador);
     }
 
-    @Test
-    void entornoJUnitFunciona() {
-        assertTrue(true);
-    }
-
     @Nested
     @DisplayName("R1 · Cancelación con 2 horas o más de anticipación")
     class Cancelacion {
@@ -125,6 +120,8 @@ class ReservaServiceTest {
         @ValueSource(ints = {0, -1})
         @DisplayName("CP-05/CP-06 · Sin anticipación u hora ya pasada no permiten cancelar")
         void sinAnticipacionSuficienteNoPermiteCancelar(int horas) {
+            // Arrange: las horas llegan como parámetro (0 y -1)
+
             // Act
             boolean resultado = servicio.puedeCancelar(horas);
 
@@ -162,6 +159,8 @@ class ReservaServiceTest {
         })
         @DisplayName("CP-08/CP-09/CP-10 · Aplica 15 % a VIP y 10 % a ESTUDIANTE sin importar mayúsculas")
         void aplicaDescuentoSegunTipo(String caso, String tipo, double totalBase, double esperado) {
+            // Arrange: tipo, total base y resultado esperado llegan desde @CsvSource
+
             // Act
             double total = servicio.calcularTotal(tipo, totalBase);
 
