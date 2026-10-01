@@ -1,0 +1,4 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+semana7-proyecto-base-ae6,edu.uees.testing.service,ReservaService,0,74,0,12,0,21,0,10,0,4
+semana7-proyecto-base-ae6,edu.uees.testing.domain,Reserva,17,26,3,3,5,9,6,3,3,3
+semana7-proyecto-base-ae6,edu.uees.testing.domain,EstadoReserva,0,21,0,0,0,4,0,1,0,1

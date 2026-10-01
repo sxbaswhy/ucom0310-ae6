@@ -1,0 +1,19 @@
+package edu.uees.testing.service;
+import edu.uees.testing.domain.Reserva;
+import org.junit.jupiter.api.Test;
+import static org.mockito.Mockito.*;
+class SinAsercionesTest {
+  @Test void ejecutaTodoSinVerificarNada() {
+    var d = mock(edu.uees.testing.availability.DisponibilidadClient.class);
+    var s = new ReservaService(d, mock(edu.uees.testing.repository.ReservaRepository.class), mock(edu.uees.testing.notification.Notificador.class));
+    s.puedeCancelar(1); s.puedeCancelar(5);
+    s.calcularTotal("VIP", 100); s.calcularTotal("ESTUDIANTE", 100); s.calcularTotal("NORMAL", 100);
+    try { s.calcularTotal("NORMAL", -1); } catch (RuntimeException e) { }
+    try { s.confirmar(null); } catch (RuntimeException e) { }
+    Reserva r = new Reserva("R", "NORMAL");
+    when(d.estaDisponible(r)).thenReturn(false);
+    try { s.confirmar(r); } catch (RuntimeException e) { }
+    when(d.estaDisponible(r)).thenReturn(true);
+    s.confirmar(r);
+  }
+}
