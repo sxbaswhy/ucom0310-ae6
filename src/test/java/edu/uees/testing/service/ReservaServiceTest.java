@@ -21,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -177,6 +179,22 @@ class ReservaServiceTest {
             assertEquals(100.0, total, DELTA);
         }
 
+        /**
+         * Añadida tras el análisis de JaCoCo: el método ya tenía 100 % de ramas,
+         * pero ninguna prueba enviaba {@code tipo == null}. La rama "sin descuento"
+         * estaba cubierta por NORMAL, así que el porcentaje no revelaba este riesgo
+         * de NullPointerException.
+         */
+        @Test
+        @DisplayName("CP-18 · Tipo nulo no lanza NullPointerException y no recibe descuento")
+        void tipoNuloNoRecibeDescuento() {
+            // Act
+            double total = servicio.calcularTotal(null, 100.0);
+
+            // Assert
+            assertEquals(100.0, total, DELTA);
+        }
+
         @Test
         @DisplayName("CP-12 · Límite: total base 0 es válido y no lanza excepción")
         void totalCeroEsValido() {
@@ -275,6 +293,47 @@ class ReservaServiceTest {
             // Assert
             assertEquals("Reserva obligatoria", error.getMessage());
             verifyNoInteractions(disponibilidad, repository, notificador);
+        }
+
+        /*
+         * CP-19 y CP-20 se añadieron tras el análisis de JaCoCo. confirmar() ya tenía
+         * 100 % de líneas y ramas, pero el reporte no muestra qué pasa cuando un
+         * colaborador externo falla. Los mocks permiten simular esas fallas sin base
+         * de datos ni servidor de correo reales.
+         */
+
+        @Test
+        @DisplayName("CP-19 · Si falla el guardado, la excepción se propaga y NO se notifica al cliente")
+        void falloAlGuardarSePropagaYNoNotifica() {
+            // Arrange
+            Reserva reserva = new Reserva("R-003", "NORMAL");
+            when(disponibilidad.estaDisponible(reserva)).thenReturn(true); // Stub
+            doThrow(new RuntimeException("BD no disponible")).when(repository).guardar(reserva);
+
+            // Act
+            RuntimeException error = assertThrows(
+                    RuntimeException.class,
+                    () -> servicio.confirmar(reserva));
+
+            // Assert
+            assertEquals("BD no disponible", error.getMessage());
+            verifyNoInteractions(notificador);
+        }
+
+        @Test
+        @DisplayName("CP-20 · Si falla la notificación, la excepción se propaga y la reserva ya quedó guardada")
+        void falloAlNotificarSePropagaYLaReservaYaQuedoGuardada() {
+            // Arrange
+            Reserva reserva = new Reserva("R-004", "VIP");
+            when(disponibilidad.estaDisponible(reserva)).thenReturn(true); // Stub
+            doThrow(new RuntimeException("SMTP caído")).when(notificador).enviarConfirmacion(reserva);
+
+            // Act
+            assertThrows(RuntimeException.class, () -> servicio.confirmar(reserva));
+
+            // Assert: caracteriza el comportamiento actual (ver limitaciones en el PR)
+            assertEquals(EstadoReserva.CONFIRMADA, reserva.getEstado());
+            verify(repository).guardar(reserva);
         }
     }
 }
