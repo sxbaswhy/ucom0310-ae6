@@ -45,3 +45,14 @@ Las reglas se obtuvieron leyendo el código productivo (`ReservaService`, `Reser
 
 **Total de casos de diseño inicial:** 17 (6 de cancelación, 8 de cálculo de total, 3 de confirmación).
 Distribución por tipo: Normal 3 · Alternativo 5 · Límite 6 · Inválido/Excepción 5 (CP-14 y CP-16 combinan dos tipos).
+
+## 4. Casos incorporados a partir del análisis de JaCoCo
+
+Después de la primera ejecución con cobertura (ver `docs/02_ANALISIS_COBERTURA_PLANTILLA.md`) se añadieron estos casos. La columna **Hallazgo** indica qué evidencia los motivó.
+
+| ID | Regla | Método | Escenario | Entrada | Esperado | Tipo | Riesgo | Hallazgo que lo motivó | Prueba JUnit |
+|---|---|---|---|---|---|---|---|---|---|
+| CP-21 | R5 | `Reserva(...)` | Id nulo | `null, "VIP"` | `IllegalArgumentException("Id obligatorio")` | Inválido / Excepción | **Alto** | Línea 10 de `Reserva`: 2 de 4 ramas sin cubrir; línea 11 (`throw`) en rojo. | `ReservaTest.idNuloOEnBlancoLanzaExcepcion` |
+| CP-22 | R5 | `Reserva(...)` | Id vacío o en blanco | `""` · `"   "` | `IllegalArgumentException("Id obligatorio")` | Límite / Inválido | **Alto** | Misma rama: `isBlank()` distingue `""` de `"   "`. | `ReservaTest.idNuloOEnBlancoLanzaExcepcion` |
+| CP-23 | R5 | `Reserva(...)` | Tipo nulo | `"R-010", null` | tipo `NORMAL`, estado `PENDIENTE` | Alternativo | Medio | Línea 14: rama `tipo == null` sin cubrir. | `ReservaTest.tipoNuloSeAsumeNormalYNacePendiente` |
+| CP-24 | R5 | `cancelar()` | Cancelar reserva | `R-011` | estado `CANCELADA` | Normal | Medio | `cancelar()` con 0 % de cobertura (líneas 35-36 en rojo). | `ReservaTest.cancelarCambiaEstadoACancelada` |
