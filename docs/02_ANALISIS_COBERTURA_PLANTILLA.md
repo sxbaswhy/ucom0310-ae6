@@ -14,7 +14,9 @@ Primero se midió la cobertura con los 17 casos del diseño inicial (CP-01 a CP-
 | `ReservaService` | 74/74 (100 %) | 12/12 (100 %) | 21/21 (100 %) | 4/4 (100 %) |
 | `Reserva` | 26/43 (**60 %**) | 3/6 (**50 %**) | 9/14 (64 %) | 3/6 (50 %) |
 | `EstadoReserva` | 21/21 (100 %) | — | 4/4 | 1/1 |
-| **Total** | **121/138 (87 %)** | **15/18 (83 %)** | **34/39 (87 %)** | **8/11 (73 %)** |
+| **Total** | **121/138 (87 %)** | **15/18 (83 %)** | **34/39 (87 %)** | **8/11 (72 %)** |
+
+Porcentajes truncados, como los muestra JaCoCo (121/138 = 87,7 % → 87 %).
 
 Capturas: `01_jacoco_inicial_resumen.png`, `02_jacoco_inicial_reserva_metodos.png`, `03_jacoco_inicial_reserva_fuente.png`.
 

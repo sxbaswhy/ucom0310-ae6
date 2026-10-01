@@ -61,7 +61,7 @@ La salida completa queda en `docs/evidencias/mvn-clean-test.txt` (generada con `
 
 | Medición | Instrucciones | Ramas | Líneas | Métodos |
 |---|---|---|---|---|
-| Inicial (17 casos de diseño) | 87 % (121/138) | 83 % (15/18) | 87 % (34/39) | 73 % (8/11) |
+| Inicial (17 casos de diseño) | 87 % (121/138) | 83 % (15/18) | 87 % (34/39) | 72 % (8/11) |
 | Final (24 casos, 26 ejecuciones) | **100 %** (138/138) | **100 %** (18/18) | **100 %** (39/39) | **100 %** (11/11) |
 
 **Interpretación:**

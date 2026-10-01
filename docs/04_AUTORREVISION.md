@@ -6,7 +6,7 @@ Revisión hecha antes de abrir el Pull Request sobre `git diff main..ae6/suite-p
 
 | # | Criterio | Estado | Evidencia / cómo se comprobó |
 |---|---|---|---|
-| 1 | Revisé *Files changed* línea por línea | ✅ | `git diff --stat main..HEAD`: 18 archivos. Solo pruebas, documentación, evidencias y scripts. |
+| 1 | Revisé *Files changed* línea por línea | ✅ | `git diff --stat main..HEAD`: 20 archivos. Solo pruebas, documentación, evidencias y scripts. |
 | 2 | Código productivo sin cambios | ✅ | `git diff main..HEAD -- src/main` vacío. Ninguna prueba se hizo pasar modificando `src/main`. |
 | 3 | No hay `target/` ni archivos generados | ✅ | `.gitignore` excluye `target/`. `git diff --name-only main..HEAD \| grep -E "target/\|\.class\|\.exec"` sin resultados. |
 | 4 | No hay credenciales ni datos sensibles | ✅ | `git grep -i -E "password\|secret\|api_key"` sin resultados. |
@@ -29,6 +29,7 @@ Revisión hecha antes de abrir el Pull Request sobre `git diff main..ae6/suite-p
 | B | Las pruebas parametrizadas no marcaban el bloque *Arrange*, a diferencia del resto. | Lectura AAA inconsistente. | Se añadió el comentario `// Arrange` indicando el origen de los datos (`@ValueSource` / `@CsvSource`). | mismo commit |
 | C | La primera medición de JaCoCo mostró `Reserva` con 50 % de ramas y `cancelar()` al 0 %. | Validaciones del dominio nunca ejecutadas. | Se añadieron CP-21 a CP-24 (`ReservaTest`). | `test: cubrir validaciones de Reserva...` |
 | D | `ReservaService` al 100 % sin probar tipo `null` ni fallas de colaboradores. | Falsa sensación de seguridad por el porcentaje. | Se añadieron CP-18, CP-19 y CP-20. | `test: agregar tipo nulo y fallas de colaboradores...` |
+| E | En la revisión final, la cobertura de métodos figuraba como 73 % (redondeo) mientras el resto de cifras seguía el criterio de JaCoCo, que trunca (87 % para 121/138). El conteo de *Files changed* tampoco incluía los últimos documentos. | Cifras incoherentes entre documentos y reporte. | Se unificó el criterio truncado (8/11 = 72 %) y se actualizó el conteo a 20 archivos. | `docs: unificar porcentajes truncados y conteo de archivos` |
 
 ## 3. Decisiones revisadas y mantenidas
 
